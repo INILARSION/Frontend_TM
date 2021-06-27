@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Turing Machine</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "Roboto Light", sans-serif;
+        }
+
+        #header {
+            padding-top: 1vh;
+            padding-left: 1vw;
+            width: 99vw;
+            height: 4vh;
+            background-color: #3F51B5;
+            vertical-align: center;
+            color: white;
+            font-size: 2vh;
+            box-shadow: 0 1px 5px #000000;
+        }
+
+        #content {
+            display: grid;
+            min-height: 90vh;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 4fr 4fr;
+            grid-template-areas: "type type" "program tape" "output output";
+
+        }
+
+        #input {
+            display: inline-block;
+        }
+
+        .selected_setting {
+            background-color:#86A8E7;
+        }
+
+        #program, #tape, #output {
+            margin-right: 1vw;
+            margin-left: 1vw;
+        }
+
+        #program {
+            grid-area: program;
+        }
+
+        #tape {
+            grid-area: tape;
+        }
+
+        #type-picker {
+            grid-area: type;
+        }
+
+        #type-picker button {
+            padding: 1vh 1vw;
+            margin-top: 2vh;
+            margin-left: 13%;
+            border-style: none;
+            border-color: Transparent;
+            box-shadow: 0 0 8px #868585;
+        }
+
+        textarea {
+            height: 35vh;
+            width: 100%;
+            border-style: none;
+            border-color: Transparent;
+            overflow: auto;
+            box-shadow: 0 1px 5px #000000;
+        }
+        #output {
+            grid-area: output;
+        }
+
+
+        #submit {
+            margin-left: 90vw;
+            padding: 1vh 1vw;
+            font-size: 2vh;
+            border-style: none;
+            border-color: Transparent;
+            box-shadow: 0 1px 5px #000000;
+        }
+    </style>
+</head>
+<body>
+
+<div id="header">
+    <div id="name">
+        Turing Machine
+    </div>
+</div>
+
+<div id="content">
+
+    <div id="type-picker">
+        <button id="TM" class="picker-btn selected_setting">Turing Machine</button>
+        <button id="Multitape" class="picker-btn">Multitape Turing Machine</button>
+        <button id="Nondeterministic" class="picker-btn">Nondeterministic Turing Machine</button>
+        <button id="High-level" class="picker-btn">High-level Turing Machine</button>
+    </div>
+
+    <div id="program">
+        Turing Machine program:<br/>
+        <textarea id="program_text" name="program" >
+
+        </textarea>
+    </div>
+
+    <div id="tape">
+        Turing Machine tape:<br/>
+        <textarea  id="tape_text" name="tape">
+
+        </textarea>
+    </div>
+
+    <div id="output">
+        Output:<br/>
+        <textarea id="output_text" readonly>
+
+    </textarea>
+    </div>
+
+  </div>
+
+    <button id="submit">
+        Submit
+    </button>
+
+<script>
+    let picker_btns = document.getElementsByClassName("picker-btn");
+    let submit_btn = document.getElementById("submit");
+    let program_area = document.getElementById("program_text");
+    let tape_area = document.getElementById("tape_text");
+    let output_area = document.getElementById("output_text");
+
+    function picker_handler (active_element) {
+        let old_element = document.getElementsByClassName("selected_setting")[0];
+        old_element.classList.remove("selected_setting");
+        old_element.setAttribute("style", "background-color:#F0F0F0;");
+
+        active_element.setAttribute("style","background-color:#86A8E7");
+        active_element.setAttribute("class", "selected_setting");
+    }
+
+    function submit_data() {
+        let selected_type = document.getElementsByClassName("selected_setting")[0];
+        let TM_input = {
+            "type": selected_type.id,
+            "program": program_area.value,
+            "tape": tape_area.value,
+        }
+
+        fetch("/run_tm/", {
+          method: "POST",
+          body: JSON.stringify(TM_input)
+        }).then(res => res.text()).then(data => {
+            output_area.value = data;
+        });
+    }
+
+    submit_btn.onclick = submit_data;
+
+    for (let picker_btn of picker_btns) {
+        picker_btn.onclick = _ => picker_handler(picker_btn)
+    }
+</script>
+
+</body>
+</html>
