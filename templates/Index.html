@@ -77,9 +77,22 @@
             grid-area: output;
         }
 
+        #submit_div {
+            margin-left: 80vw;
+            font-size: 1.5vh;
+        }
+
+        #makro_div {
+            display: inline;
+        }
+
+        #makro {
+            transform: scale(1.5);
+        }
+
 
         #submit {
-            margin-left: 90vw;
+            margin-left: 2vw;
             padding: 1vh 1vw;
             font-size: 2vh;
             border-style: none;
@@ -128,22 +141,39 @@
 
   </div>
 
-    <button id="submit">
-        Submit
-    </button>
+    <div id="submit_div">
+        <div id="makro_div">
+            Makro Compiler:
+            <input id="makro" type="checkbox">
+        </div>
 
+        <button id="submit">
+            Submit
+        </button>
+    </div>
 <script>
     let picker_btns = document.getElementsByClassName("picker-btn");
     let submit_btn = document.getElementById("submit");
     let program_area = document.getElementById("program_text");
     let tape_area = document.getElementById("tape_text");
     let output_area = document.getElementById("output_text");
+    let makro_checkbox = document.getElementById("makro");
+    let makro_div = document.getElementById("makro_div");
 
     function picker_handler (active_element) {
         let old_element = document.getElementsByClassName("selected_setting")[0];
         old_element.classList.remove("selected_setting");
         old_element.setAttribute("style", "background-color:#F0F0F0;");
 
+        if (active_element.id === "TM" || active_element.id === "Nondeterministic") {
+            makro_checkbox.removeAttribute("disabled");
+            makro_div.setAttribute("color", "black");
+            makro_div.style.color = "black";
+        } else {
+            makro_checkbox.setAttribute("disabled", "disabled");
+            makro_div.setAttribute("color", "gray");
+            makro_div.style.color = "gray";
+        }
         active_element.setAttribute("style","background-color:#86A8E7");
         active_element.setAttribute("class", "selected_setting");
     }
@@ -154,6 +184,7 @@
             "type": selected_type.id,
             "program": program_area.value,
             "tape": tape_area.value,
+            "makro": makro_checkbox.checked,
         }
 
         fetch("/run_tm/", {
