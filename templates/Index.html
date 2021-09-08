@@ -159,13 +159,14 @@
     let output_area = document.getElementById("output_text");
     let makro_checkbox = document.getElementById("makro");
     let makro_div = document.getElementById("makro_div");
+    let supports_makro_compiler = ["TM", "Nondeterministic"];
 
     function picker_handler (active_element) {
         let old_element = document.getElementsByClassName("selected_setting")[0];
         old_element.classList.remove("selected_setting");
         old_element.setAttribute("style", "background-color:#F0F0F0;");
 
-        if (active_element.id === "TM" || active_element.id === "Nondeterministic") {
+        if (supports_makro_compiler.includes(active_element.id)) {
             makro_checkbox.removeAttribute("disabled");
             makro_div.setAttribute("color", "black");
             makro_div.style.color = "black";

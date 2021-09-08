@@ -5,11 +5,14 @@ import random
 import os
 from subprocess import run, PIPE
 
+# save index page globally
+# prevents loading the same file from disk multiple times
 index_page = None
 with open("./templates/Index.html", "r") as page:
     index_page = page.read()
 
 
+# serve the index page
 def index(request):
     return HttpResponse(index_page)
 
@@ -97,6 +100,8 @@ def handle_high_level_tm(request_dict, session_id):
     return "Not yet implemented"
 
 
+# handles POST-request with the turing machine data
+# uses the helper functions to execute the binaries as a subprocess
 @csrf_exempt
 def run_tm(request):
     request_dict = json.loads(request.body.decode('utf8'))
