@@ -34,23 +34,28 @@ def handle_makros(program_string, session_id):
     create_file(file_name, program_string)
     p = run([base_path / "binaries/makro_compiler", file_name, result_file], stdout=PIPE, encoding="ascii", stderr=PIPE)
     remove_file(file_name)
+    result = {
+        "Returncode": p.returncode,
+        "Error": p.stdout,
+        "Tape": None
+    }
     if p.returncode != 0:
-        print("Wrong return code !!!!")
         remove_file(result_file)
-        return "Returncode: {}\n{}".format(str(p.returncode), p.stderr)
-    result = None
+        return result
     with open(result_file, "r") as file:
-        result = file.read()
+        result["Output"] = file.read()
     remove_file(result_file)
     return result
 
 
 def handle_tm(request_dict, session_id):
     program_string = None
-    if request_dict.get("makro") == "true":
-        program_string = handle_makros(request_dict["program"], session_id)
-        if program_string.startswith("Returncode:"):
-            return program_string
+    if request_dict.get("makro"):
+        program = handle_makros(request_dict["program"], session_id)
+        if program["Returncode"] != 0:
+            return program
+        else:
+            program_string = program["Output"]
     else:
         program_string = request_dict["program"]
     program_file = str(base_path / "binaries/tm_prog") + session_id
@@ -63,7 +68,7 @@ def handle_tm(request_dict, session_id):
     return {
         "Returncode": p.returncode,
         "Output": p.stdout,
-        "Error": p.stderr,
+        "Error": p.stdout,
         "Tape": None
     }
 
@@ -79,7 +84,7 @@ def handle_multitape_tm(request_dict, session_id):
     return {
         "Returncode": p.returncode,
         "Output": p.stdout,
-        "Error": p.stderr,
+        "Error": p.stdout,
         "Tape": None
     }
 
@@ -95,7 +100,7 @@ def handle_multitape_compiler(request_dict, session_id):
     return {
         "Returncode": p.returncode,
         "Output": p.stdout,
-        "Error": p.stderr,
+        "Error": p.stdout,
         "Tape": None
     }
 
@@ -103,9 +108,11 @@ def handle_multitape_compiler(request_dict, session_id):
 def handle_nondeterministic_tm(request_dict, session_id):
     program_string = None
     if request_dict.get("makro"):
-        program_string = handle_makros(request_dict["program"], session_id)
-        if program_string.startswith("Returncode:"):
-            return program_string
+        program = handle_makros(request_dict["program"], session_id)
+        if program["Returncode"] != 0:
+            return program
+        else:
+            program_string = program["Output"]
     else:
         program_string = request_dict["program"]
     program_file = str(base_path / "binaries/nondeterministic_tm_prog") + session_id
@@ -115,7 +122,7 @@ def handle_nondeterministic_tm(request_dict, session_id):
     return {
         "Returncode": p.returncode,
         "Output": p.stdout,
-        "Error": p.stderr,
+        "Error": p.stdout,
         "Tape": None
     }
 
