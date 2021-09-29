@@ -3,12 +3,14 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 import random
 import os
+from pathlib import Path
 from subprocess import run, PIPE
 
 # save index page globally
 # prevents loading the same file from disk multiple times
 index_page = None
-with open("./templates/Index.html", "r") as page:
+base_path = Path(os.path.dirname(os.path.abspath(__file__))).parent
+with open(base_path / "templates/Index.html", "r") as page:
     index_page = page.read()
 
 
