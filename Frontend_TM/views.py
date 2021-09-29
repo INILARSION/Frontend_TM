@@ -29,10 +29,10 @@ def remove_file(filename):
 
 
 def handle_makros(program_string, session_id):
-    file_name = "./binaries/makro_file" + session_id
-    result_file = "./binaries/makro_file_result" + session_id
+    file_name = str(base_path / "binaries/makro_file") + session_id
+    result_file = str(base_path / "binaries/makro_file_result") + session_id
     create_file(file_name, program_string)
-    p = run(["./binaries/makro_compiler", file_name, result_file], stdout=PIPE, encoding="ascii", stderr=PIPE)
+    p = run([base_path / "binaries/makro_compiler", file_name, result_file], stdout=PIPE, encoding="ascii", stderr=PIPE)
     remove_file(file_name)
     if p.returncode != 0:
         print("Wrong return code !!!!")
@@ -53,11 +53,11 @@ def handle_tm(request_dict, session_id):
             return program_string
     else:
         program_string = request_dict["program"]
-    program_file = "./binaries/tm_prog" + session_id
-    tape_file = "./binaries/tm_tape" + session_id
+    program_file = str(base_path / "binaries/tm_prog") + session_id
+    tape_file = str(base_path / "binaries/tm_tape") + session_id
     create_file(program_file, program_string)
     create_file(tape_file, request_dict["tape"])
-    p = run(["./binaries/turing_machine", program_file], stdout=PIPE, input=request_dict["tape"], encoding="ascii", stderr=PIPE)
+    p = run([base_path / "binaries/turing_machine", program_file], stdout=PIPE, input=request_dict["tape"], encoding="ascii", stderr=PIPE)
     remove_file(program_file)
     remove_file(tape_file)
     return {
@@ -69,11 +69,11 @@ def handle_tm(request_dict, session_id):
 
 
 def handle_multitape_tm(request_dict, session_id):
-    program_file = "./binaries/multitape_tm_prog" + session_id
-    tape_file = "./binaries/multitape_tm_tape" + session_id
+    program_file = str(base_path / "binaries/multitape_tm_prog") + session_id
+    tape_file = str(base_path / "binaries/multitape_tm_tape") + session_id
     create_file(program_file, request_dict["program"])
     create_file(tape_file, request_dict["tape"])
-    p = run(["./binaries/multitape_tm", "-v", program_file, tape_file], stdout=PIPE, encoding="ascii", stderr=PIPE)
+    p = run([base_path / "binaries/multitape_tm", "-v", program_file, tape_file], stdout=PIPE, encoding="ascii", stderr=PIPE)
     remove_file(program_file)
     remove_file(tape_file)
     return {
@@ -85,11 +85,11 @@ def handle_multitape_tm(request_dict, session_id):
 
 
 def handle_multitape_compiler(request_dict, session_id):
-    program_file = "./binaries/multitape_tm_prog" + session_id
-    tape_file = "./binaries/multitape_tm_tape" + session_id
+    program_file = str(base_path / "binaries/multitape_tm_prog") + session_id
+    tape_file = str(base_path / "binaries/multitape_tm_tape") + session_id
     create_file(program_file, request_dict["program"])
     create_file(tape_file, request_dict["tape"])
-    p = run(["./binaries/multitape_tm", tape_file, program_file], stdout=PIPE, encoding="ascii", stderr=PIPE)
+    p = run([base_path / "binaries/multitape_tm", tape_file, program_file], stdout=PIPE, encoding="ascii", stderr=PIPE)
     remove_file(program_file)
     remove_file(tape_file)
     return {
@@ -108,9 +108,9 @@ def handle_nondeterministic_tm(request_dict, session_id):
             return program_string
     else:
         program_string = request_dict["program"]
-    program_file = "./binaries/nondeterministic_tm_prog" + session_id
+    program_file = str(base_path / "binaries/nondeterministic_tm_prog") + session_id
     create_file(program_file, program_string)
-    p = run(["./binaries/nondeterministic_tm", "-v", program_file], stdout=PIPE, encoding="ascii", stderr=PIPE)
+    p = run([base_path / "binaries/nondeterministic_tm", "-v", program_file], stdout=PIPE, encoding="ascii", stderr=PIPE)
     remove_file(program_file)
     return {
         "Returncode": p.returncode,
@@ -121,10 +121,10 @@ def handle_nondeterministic_tm(request_dict, session_id):
 
 
 def handle_high_level_tm(request_dict, session_id):
-    program_file = "./binaries/nondeterministic_tm_prog" + session_id
-    output_file = "./binaries/nondeterministic_tm_out" + session_id
+    program_file = str(base_path / "binaries/nondeterministic_tm_prog") + session_id
+    output_file = str(base_path / "binaries/nondeterministic_tm_out") + session_id
     create_file(program_file, request_dict["program"])
-    p = run(["./binaries/high_level_compiler", "-v", program_file, output_file], stdout=PIPE, encoding="ascii", stderr=PIPE)
+    p = run([base_path / "binaries/high_level_compiler", "-v", program_file, output_file], stdout=PIPE, encoding="ascii", stderr=PIPE)
     result = {
         "Returncode": p.returncode,
         "Error": p.stderr,
