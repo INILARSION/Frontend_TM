@@ -58,9 +58,12 @@ def handle_tm(request_dict, session_id):
     p = run(["./binaries/turing_machine", program_file], stdout=PIPE, input=request_dict["tape"], encoding="ascii", stderr=PIPE)
     remove_file(program_file)
     remove_file(tape_file)
-    if p.returncode != 0:
-        return "Returncode: {}\n{}".format(str(p.returncode), p.stderr)
-    return p.stdout
+    return {
+        "Returncode": p.returncode,
+        "Output": p.stdout,
+        "Error": p.stderr,
+        "Tape": None
+    }
 
 
 def handle_multitape_tm(request_dict, session_id):
@@ -68,12 +71,31 @@ def handle_multitape_tm(request_dict, session_id):
     tape_file = "./binaries/multitape_tm_tape" + session_id
     create_file(program_file, request_dict["program"])
     create_file(tape_file, request_dict["tape"])
+    p = run(["./binaries/multitape_tm", "-v", program_file, tape_file], stdout=PIPE, encoding="ascii", stderr=PIPE)
+    remove_file(program_file)
+    remove_file(tape_file)
+    return {
+        "Returncode": p.returncode,
+        "Output": p.stdout,
+        "Error": p.stderr,
+        "Tape": None
+    }
+
+
+def handle_multitape_compiler(request_dict, session_id):
+    program_file = "./binaries/multitape_tm_prog" + session_id
+    tape_file = "./binaries/multitape_tm_tape" + session_id
+    create_file(program_file, request_dict["program"])
+    create_file(tape_file, request_dict["tape"])
     p = run(["./binaries/multitape_tm", tape_file, program_file], stdout=PIPE, encoding="ascii", stderr=PIPE)
     remove_file(program_file)
     remove_file(tape_file)
-    if p.returncode != 0:
-        return "Returncode: {}\n{}".format(str(p.returncode), p.stderr)
-    return p.stdout
+    return {
+        "Returncode": p.returncode,
+        "Output": p.stdout,
+        "Error": p.stderr,
+        "Tape": None
+    }
 
 
 def handle_nondeterministic_tm(request_dict, session_id):
@@ -85,19 +107,34 @@ def handle_nondeterministic_tm(request_dict, session_id):
     else:
         program_string = request_dict["program"]
     program_file = "./binaries/nondeterministic_tm_prog" + session_id
-    tape_file = "./binaries/nondeterministic_tm_tape" + session_id
     create_file(program_file, program_string)
-    create_file(tape_file, request_dict["tape"])
-    p = run(["./binaries/nondeterministic_tm", tape_file, program_file], stdout=PIPE, encoding="ascii", stderr=PIPE)
+    p = run(["./binaries/nondeterministic_tm", "-v", program_file], stdout=PIPE, encoding="ascii", stderr=PIPE)
     remove_file(program_file)
-    remove_file(tape_file)
-    if p.returncode != 0:
-        return "Returncode: {}\n{}".format(str(p.returncode), p.stderr)
-    return p.stdout
+    return {
+        "Returncode": p.returncode,
+        "Output": p.stdout,
+        "Error": p.stderr,
+        "Tape": None
+    }
 
 
 def handle_high_level_tm(request_dict, session_id):
-    return "Not yet implemented"
+    program_file = "./binaries/nondeterministic_tm_prog" + session_id
+    output_file = "./binaries/nondeterministic_tm_out" + session_id
+    create_file(program_file, request_dict["program"])
+    p = run(["./binaries/high_level_compiler", "-v", program_file, output_file], stdout=PIPE, encoding="ascii", stderr=PIPE)
+    result = {
+        "Returncode": p.returncode,
+        "Error": p.stderr,
+    }
+    with open(output_file + ".delta", "r") as delta_file:
+        result["Output"] = delta_file.read()
+    with open(output_file + ".tape", "r") as tape_file:
+        result["Tape"] = tape_file.read()
+    remove_file(program_file)
+    remove_file(output_file + ".delta")
+    remove_file(output_file + ".tape")
+    return result
 
 
 # handles POST-request with the turing machine data
@@ -109,10 +146,13 @@ def run_tm(request):
     response = None
     if request_dict["type"] == "TM":
         response = handle_tm(request_dict, session_id)
-    elif request_dict["type"] == "Multitape":
+    elif request_dict["type"] == "Multitape_Compiler":
+        response = handle_multitape_compiler(request_dict, session_id)
+    elif request_dict["type"] == "Multitape_TM":
         response = handle_multitape_tm(request_dict, session_id)
     elif request_dict["type"] == "Nondeterministic":
         response = handle_nondeterministic_tm(request_dict, session_id)
     elif request_dict["type"] == "High-level":
         response = handle_high_level_tm(request_dict, session_id)
+    response = json.dumps(response)
     return HttpResponse(response)

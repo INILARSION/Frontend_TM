@@ -59,7 +59,7 @@
         #type-picker button {
             padding: 1vh 1vw;
             margin-top: 2vh;
-            margin-left: 13%;
+            margin-left: 9%;
             border-style: none;
             border-color: Transparent;
             box-shadow: 0 0 8px #868585;
@@ -78,7 +78,7 @@
         }
 
         #submit_div {
-            margin-left: 80vw;
+            margin-left: 75vw;
             font-size: 1.5vh;
         }
 
@@ -99,6 +99,15 @@
             border-color: Transparent;
             box-shadow: 0 1px 5px #000000;
         }
+
+        #help {
+            margin-right: 0.5vw;
+            padding: 0.4vh 0.4vw;
+            font-size: 1.4vh;
+            border-style: none;
+            border-color: Transparent;
+            box-shadow: 0 1px 5px #000000;
+        }
     </style>
 </head>
 <body>
@@ -113,20 +122,21 @@
 
     <div id="type-picker">
         <button id="TM" class="picker-btn selected_setting">Turing Machine</button>
-        <button id="Multitape" class="picker-btn">Multitape Turing Machine</button>
+        <button id="Multitape_TM" class="picker-btn">Multitape Turing Machine</button>
         <button id="Nondeterministic" class="picker-btn">Nondeterministic Turing Machine</button>
-        <button id="High-level" class="picker-btn">High-level Turing Machine</button>
+        <button id="Multitape_Compiler" class="picker-btn">Multitape Compiler</button>
+        <button id="High-level" class="picker-btn">High-level Compiler</button>
     </div>
 
     <div id="program">
-        Turing Machine program:<br/>
+        Program:<br/>
         <textarea id="program_text" name="program" >
 
         </textarea>
     </div>
 
     <div id="tape">
-        Turing Machine tape:<br/>
+        Tape:<br/>
         <textarea  id="tape_text" name="tape">
 
         </textarea>
@@ -142,6 +152,9 @@
   </div>
 
     <div id="submit_div">
+        <button id="help">
+            help
+        </button>
         <div id="makro_div">
             Makro Compiler:
             <input id="makro" type="checkbox">
@@ -154,12 +167,19 @@
 <script>
     let picker_btns = document.getElementsByClassName("picker-btn");
     let submit_btn = document.getElementById("submit");
+    let help_btn = document.getElementById("help");
     let program_area = document.getElementById("program_text");
     let tape_area = document.getElementById("tape_text");
     let output_area = document.getElementById("output_text");
     let makro_checkbox = document.getElementById("makro");
     let makro_div = document.getElementById("makro_div");
     let supports_makro_compiler = ["TM", "Nondeterministic"];
+    let no_tape = ["High-level"];
+
+    // remove weird spaces
+    tape_area.value = "";
+    program_area.value = "";
+    output_area.value = "";
 
     function picker_handler (active_element) {
         let old_element = document.getElementsByClassName("selected_setting")[0];
@@ -175,8 +195,43 @@
             makro_div.setAttribute("color", "gray");
             makro_div.style.color = "gray";
         }
+
+        if (no_tape.includes(active_element.id)) {
+            tape_area.setAttribute("readonly", "readonly");
+        } else {
+            tape_area.removeAttribute("readonly");
+        }
+
         active_element.setAttribute("style","background-color:#86A8E7");
         active_element.setAttribute("class", "selected_setting");
+    }
+
+    function show_help() {
+        let active_tm = document.getElementsByClassName("selected_setting")[0];
+        let alert_text;
+        switch (active_tm.id) {
+            case "TM":
+                alert_text = "";
+                break;
+
+            case "Multitape_Compiler":
+                alert_text = "";
+                break;
+
+            case "Multitape_TM":
+                alert_text = "";
+                break;
+
+            case "Nondeterministic":
+                alert_text = "";
+                break;
+
+            case "High-level":
+                alert_text = "";
+                break;
+        }
+
+        window.alert(alert_text);
     }
 
     function submit_data() {
@@ -192,11 +247,21 @@
           method: "POST",
           body: JSON.stringify(TM_input)
         }).then(res => res.text()).then(data => {
-            output_area.value = data;
+            let data_obj = JSON.parse(data);
+            console.log(data_obj);
+            if (data_obj["Returncode"] === 0) {
+                output_area.value = data_obj["Output"];
+                if (data_obj["Tape"] !== null) {
+                    tape_area.value = data_obj["Tape"];
+                }
+            } else {
+                output_area.value = `Returncode: ${data_obj["Returncode"]}\n${data_obj["Error"]}`;
+            }
         });
     }
 
     submit_btn.onclick = submit_data;
+    help_btn.onclick = show_help;
 
     for (let picker_btn of picker_btns) {
         picker_btn.onclick = _ => picker_handler(picker_btn)
