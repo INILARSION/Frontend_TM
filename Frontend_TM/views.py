@@ -13,6 +13,8 @@ base_path = Path(os.path.dirname(os.path.abspath(__file__))).parent
 with open(base_path / "templates/Index.html", "r") as page:
     index_page = page.read()
 
+print("Starting server at http://127.0.0.1:8000/")
+
 
 # serve the index page
 def index(request):
