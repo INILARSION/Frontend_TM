@@ -121,7 +121,7 @@ def handle_nondeterministic_tm(request_dict, session_id):
         program_string = request_dict["program"]
     program_file = str(base_path / "binaries/nondeterministic_tm_prog") + session_id
     create_file(program_file, program_string)
-    p = run([base_path / "binaries/nondeterministic_tm", "-v", program_file], stdout=PIPE, encoding="ascii", stderr=PIPE)
+    p = run([base_path / "binaries/nondeterministic_tm", "-v", program_file], input=request_dict["tape"], stdout=PIPE, encoding="ascii", stderr=PIPE)
     remove_file(program_file)
     return {
         "Returncode": p.returncode,
