@@ -14,6 +14,7 @@ base_path = Path(os.path.dirname(os.path.abspath(__file__))).parent
 with open(base_path / "templates/Index.html", "r") as page:
     index_page = page.read()
 
+# Docker container only shows warning messages, so this shows the user where to access the frontend
 logger = logging.getLogger(__name__)
 logger.critical("Starting server at http://127.0.0.1:8000/")
 
