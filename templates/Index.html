@@ -116,7 +116,7 @@
             box-shadow: 0 1px 5px #000000;
         }
 
-        #help {
+        #help, #examples {
             margin-right: 0.5vw;
             padding: 0.4vh 0.4vw;
             font-size: 1.4vh;
@@ -171,6 +171,9 @@
         <button id="help">
             help
         </button>
+        <button id="examples">
+            examples
+        </button>
         <div id="makro_div">
             Makro Compiler:
             <input id="makro" type="checkbox">
@@ -184,6 +187,7 @@
     let picker_btns = document.getElementsByClassName("picker-btn");
     let submit_btn = document.getElementById("submit");
     let help_btn = document.getElementById("help");
+    let examples_btn = document.getElementById("examples");
     let program_area = document.getElementById("program_text");
     let tape_area = document.getElementById("tape_text");
     let output_area = document.getElementById("output_text");
@@ -253,6 +257,35 @@
         window.alert(alert_text);
     }
 
+    // show the help messages for each TM type as alert
+    function show_examples() {
+        let active_tm = document.getElementsByClassName("selected_setting")[0];
+        let alert_text;
+        switch (active_tm.id) {
+            case "TM":
+                alert_text = "Program:\n\nS: start,acc,rej\nG:  ,0,1\nD: start,0,start,1,>\nD: start,1,acc,1,-\nD: start, ,rej, ,-\n\nTape:\n\n0|0|0|0|1\n";
+                break;
+
+            case "Multitape_Compiler":
+                alert_text = "Program:\n\nS: s1, halt, reject, s2\nG: a,b,1,0\nD: s1|a,0, |s2|a,0,a|>,-,>\nD: s1|a,1, |s2|a,1,a|>,-,>\nD: s1|a, , |s1|a, ,a|>,-,>\nD: s1|b,0, |s2|b,0,b|>,-,>\nD: s1|b,1, |s2|b,1,b|>,-,>\nD: s1|b, , |s1|b, ,b|>,-,>\nD: s1| , , |halt| , , |-,-,-\nD: s2|a,0, |s1|a,0,0|-,>,>\nD: s2|b,0, |s1|b,0,0|-,>,>\nD: s2| ,0, |s2| ,0,0|-,>,>\nD: s2|a,1, |s1|a,1,1|-,>,>\nD: s2|b,1, |s1|b,1,1|-,>,>\nD: s2| ,1, |s2| ,1,1|-,>,>\nD: s2| , , |halt| , , |-,-,-\n\n\nTape:\nabbab \n0101 \n \n";
+                break;
+
+            case "Multitape_TM":
+                alert_text = "Program:\n\nS: L3,accept,reject,L3adde,L3add0,L3add1\nG:  ,0,1\nD: L3, | | ,L3add0, | | ,>|>|-\nD: L3add0,0|0| ,L3add0,0|0| ,>|>|-\nD: L3add0,0|1| ,L3add0,1|1| ,>|>|-\nD: L3add0,1|0| ,L3add0,1|0| ,>|>|-\nD: L3add0,1|1| ,L3add1,0|1| ,>|>|-\nD: L3add0,0|0| ,L3add0,0|0| ,>|>|-\nD: L3add0,0|1| ,L3add0,1|1| ,>|>|-\nD: L3add0,1|0| ,L3add0,1|0| ,>|>|-\nD: L3add0,1|1| ,L3add1,0|1| ,>|>|-\nD: L3add1,0|0| ,L3add0,1|0| ,>|>|-\nD: L3add1,0|1| ,L3add1,0|1| ,>|>|-\nD: L3add1,1|0| ,L3add1,0|0| ,>|>|-\nD: L3add1,1|1| ,L3add1,1|1| ,>|>|-\nD: L3add1,0|0| ,L3add0,1|0| ,>|>|-\nD: L3add1,0|1| ,L3add1,0|1| ,>|>|-\nD: L3add1,1|0| ,L3add1,0|0| ,>|>|-\nD: L3add1,1|1| ,L3add1,1|1| ,>|>|-\nD: L3add0, | | ,L3adde, | | ,<|<|-\nD: L3add1, | | ,L3adde, | | ,<|<|-\nD: L3adde,0|0| ,L3adde,0|0| ,<|<|-\nD: L3adde,1|0| ,L3adde,1|0| ,<|<|-\nD: L3adde,0|1| ,L3adde,0|1| ,<|<|-\nD: L3adde,1|1| ,L3adde,1|1| ,<|<|-\nD: L3adde,0|0| ,L3adde,0|0| ,<|<|-\nD: L3adde,1|0| ,L3adde,1|0| ,<|<|-\nD: L3adde,0|1| ,L3adde,0|1| ,<|<|-\nD: L3adde,1|1| ,L3adde,1|1| ,<|<|-\nD: L3adde, | | ,accept, | | ,-|-|-\n\n\nTapes:\n\n |1|0|1|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0\n |0|1|0|1|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0\n |0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0";
+                break;
+
+            case "Nondeterministic":
+                alert_text = "Program:\n\nS: start,accept,reject,SBR,SBL,SRS,SLS,SR1,SR2,SR3,CheckR1,CheckR2,CheckR3,CheckL1,CheckL2,CheckL3,SWR1,SWR2,SWR3,SL1,SL2,SL3,SWL1,SWL2,SWL3\nG:  ,1,2,3\nD: start,1,SL1,1,<\nD: start,1,SR1,1,>\nD: start,2,SR2,2,>\nD: start,3,SR3,3,>\nD: start,1,SR1,1,>\nD: start,2,SR2,2,>\nD: start,3,SR3,3,>\nD: SL1, ,CheckR1, ,>\nD: CheckR1,1,CheckR1,1,>\nD: CheckR2,2,CheckR2,2,>\nD: CheckR3,3,CheckR3,3,>\nD: CheckR3, ,accept, ,-\nD: CheckR1,2,CheckR2,2,>\nD: CheckR2,3,CheckR3,3,>\nD: SR3, ,CheckL3, ,<\nD: CheckL1,1,CheckL1,1,<\nD: CheckL2,2,CheckL2,2,<\nD: CheckL3,3,CheckL3,3,<\nD: CheckL1, ,accept, ,-\nD: CheckL3,2,CheckL2,2,<\nD: CheckL2,1,CheckL1,1,<\nD: SR1,1,SR1,1,>\nD: SR1,2,SR2,2,>\nD: SR1,3,SR3,3,>\nD: SR2,1,SR1,1,>\nD: SR2,2,SR2,2,>\nD: SR2,3,SR3,3,>\nD: SR3,1,SR1,1,>\nD: SR3,2,SR2,2,>\nD: SR3,3,SR3,3,>\nD: SR1,1,SWR1,1,<\nD: SR2,1,SWR1,2,<\nD: SR3,1,SWR1,3,<\nD: SR1,2,SWR2,1,<\nD: SR2,2,SWR2,2,<\nD: SR3,2,SWR2,3,<\nD: SR1,3,SWR3,1,<\nD: SR2,3,SWR3,2,<\nD: SR3,3,SWR3,3,<\nD: SWR1,1,SBR,1,>\nD: SWR2,1,SBR,2,>\nD: SWR3,1,SBR,3,>\nD: SWR1,2,SBR,1,>\nD: SWR2,2,SBR,2,>\nD: SWR3,2,SBR,3,>\nD: SWR1,3,SBR,1,>\nD: SWR2,3,SBR,2,>\nD: SWR3,3,SBR,3,>\nD: SBR,1,SR1,1,>\nD: SBR,2,SR2,2,>\nD: SBR,3,SR3,3,>\nD: SL1,1,SL1,1,<\nD: SL1,2,SL2,2,<\nD: SL1,3,SL3,3,<\nD: SL2,1,SL1,1,<\nD: SL2,2,SL2,2,<\nD: SL2,3,SL3,3,<\nD: SL3,1,SL1,1,<\nD: SL3,2,SL2,2,<\nD: SL3,3,SL3,3,<\nD: SL1,1,SWL1,1,>\nD: SL2,1,SWL1,2,>\nD: SL3,1,SWL1,3,>\nD: SL1,2,SWL2,1,>\nD: SL2,2,SWL2,2,>\nD: SL3,2,SWL2,3,>\nD: SL1,3,SWL3,1,>\nD: SL2,3,SWL3,2,>\nD: SL3,3,SWL3,3,>\nD: SWL1,1,SBL,1,<\nD: SWL2,1,SBL,2,<\nD: SWL3,1,SBL,3,<\nD: SWL1,2,SBL,1,<\nD: SWL2,2,SBL,2,<\nD: SWL3,2,SBL,3,<\nD: SWL1,3,SBL,1,<\nD: SWL2,3,SBL,2,<\nD: SWL3,3,SBL,3,<\nD: SBL,1,SL1,1,<\nD: SBL,2,SL2,2,<\nD: SBL,3,SL3,3,<\nD: SR1, ,SLS, ,<\nD: SR2, ,SLS, ,<\nD: SR3, ,SLS, ,<\nD: SLS,1,SL1,1,<\nD: SLS,2,SL2,2,<\nD: SLS,3,SL3,3,<\nD: SL1, ,SRS, ,>\nD: SL2, ,SRS, ,>\nD: SL3, ,SRS, ,>\nD: SRS,1,SR1,1,>\nD: SRS,2,SR2,2,>\nD: SRS,3,SR3,3,>\n\n\nTape:\n\n1|3|1|2|3";
+                break;
+
+            case "High-level":
+                alert_text = "Program:\n\na = 5\nb = 10\n// add a and b\na = a + b\nif a > b then 6 else 8\nincr a\ngoto 9\ndecr a\n\na = a - b";
+                break;
+        }
+
+        window.alert(alert_text);
+    }
+
     // send data back to the backend to run the programs
     function submit_data() {
         let selected_type = document.getElementsByClassName("selected_setting")[0];
@@ -283,6 +316,7 @@
 
     submit_btn.onclick = submit_data;
     help_btn.onclick = show_help;
+    examples_btn.onclick = show_examples;
 
     for (let picker_btn of picker_btns) {
         picker_btn.onclick = _ => picker_handler(picker_btn)
